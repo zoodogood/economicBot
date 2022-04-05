@@ -11,21 +11,20 @@ const commands = [{
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 
-(async () => {
-  try {
-    const clientId = (await rest.get( Routes.user() ))
-      .id;
 
-    console.info('----\nStarted refreshing application (/) commands.');
+try {
+  const clientId = (await rest.get( Routes.user() ))
+    .id;
 
-    const out = await rest.put(
-      Routes.applicationCommands(clientId),
-      { body: commands },
-    );
+  console.info('----\nStarted refreshing application (/) commands.');
 
-    console.log(out);
-    console.info('Successfully reloaded application (/) commands.');
-  } catch (error) {
-    console.error(error);
-  }
-})();
+  const out = await rest.put(
+    Routes.applicationCommands(clientId),
+    { body: commands },
+  );
+
+  console.log(out);
+  console.info('Successfully reloaded application (/) commands.');
+} catch (error) {
+  console.error(error);
+}
