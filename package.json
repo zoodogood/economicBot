@@ -1,5 +1,6 @@
 {
   "name": "economicbot",
+  "type": "module",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -7,5 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "zoodogood",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "mysql2": "^2.3.3"
+  }
 }
