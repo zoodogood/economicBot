@@ -10,6 +10,5 @@ class App {
   }
 }
 
-console.log(EventTarget);
 globalThis.app = new App();
 app.load();

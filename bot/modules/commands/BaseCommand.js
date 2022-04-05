@@ -11,3 +11,6 @@ class BaseCommand extends EventsEmitter {
 
   static data = {};
 }
+
+
+export default BaseCommand;

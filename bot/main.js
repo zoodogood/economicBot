@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import { Client, Intents } from 'discord.js';
 
+import CommandsLoader from './modules/commands/CommandsLoader.js';
+new CommandsLoader().load();
+
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
