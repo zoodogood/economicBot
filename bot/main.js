@@ -15,11 +15,19 @@ client.on('ready', () => {
 });
 
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isCommand())
+    return;
 
-  if (interaction.commandName === 'help') {
-    await interaction.reply('Pong!');
-  }
+  const command = globalThis.commands.get(interaction.commandName);
+
+  if (!command)
+    interaction.reply( "Такой команды не существует" );
+
+
+
+  const out = command.run(interaction);
+  command.reply(out);
+
 });
 
 export default client;

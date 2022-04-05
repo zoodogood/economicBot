@@ -1,4 +1,5 @@
 import fileSystem from 'fs';
+import {Collection} from '@discordjs/collection';
 
 class CommandsLoader {
   constructor(){
@@ -7,16 +8,17 @@ class CommandsLoader {
   }
 
   load(){
-    const __dirname = import.meta.url;
-    globalThis.commands = [];
+    const __dirname = `${ process.cwd() }`;
+    globalThis.commands = new Collection();
 
-    fileSystem.readdirSync(`./bot/commands`)
+    fileSystem.readdirSync(`${ __dirname }/bot/commands/`)
       .filter(name => /^[a-z].+?\.js/.test(name))
-      .map(async name => {
-        const Command = await import(`${ __dirname }/../../../commands/${ name }`);
-        return new Command();
+      .forEach(async name => {
+        const { Command } = await import(`file://${ __dirname }/bot/commands/${ name }`);
+        const command = new Command();
+
+        globalThis.commands.set(command.name, command);
       })
-      .forEach(console.log);
   }
 }
 
