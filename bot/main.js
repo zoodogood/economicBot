@@ -26,7 +26,7 @@ client.on('interactionCreate', async interaction => {
 
 
   const out = command.run(interaction);
-  command.reply(out);
+  interaction.reply(out);
 
 });
 
