@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "refresh": "node refreshCommands.js"
+    "refresh": "npm run refreshCommands.js"
   },
   "author": "zoodogood",
   "license": "ISC",
