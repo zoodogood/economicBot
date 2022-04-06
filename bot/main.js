@@ -20,20 +20,23 @@ client.on('interactionCreate', async interaction => {
 
   const command = globalThis.commands.get(interaction.commandName);
 
-  let output = {ephemeral: true};
+  let reply = {ephemeral: true};
   try {
     if (!command)
       throw new Error("UNKNOW_COMMAND");
 
     const promise = command.run(interaction);
-    if (!interaction.deffered && !iteration.replied)
+    
+    const isPromise = promise instanceof Promise;
+    if (isPromise && !interaction.deffered && !interaction.replied)
       throw new Error("COMMAND_NOTHING_REPLY");
 
-    ouput = await promise;
+    reply = await promise;
   } catch (err) {
+    reply.content = err.message;
 
   } finally {
-    interaction.reply(ouput);
+    interaction.reply(reply);
   }
 });
 
