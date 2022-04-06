@@ -20,14 +20,21 @@ client.on('interactionCreate', async interaction => {
 
   const command = globalThis.commands.get(interaction.commandName);
 
-  if (!command)
-    interaction.reply( "Такой команды не существует" );
+  let output = {ephemeral: true};
+  try {
+    if (!command)
+      throw new Error("UNKNOW_COMMAND");
 
+    const promise = command.run(interaction);
+    if (!interaction.deffered && !iteration.replied)
+      throw new Error("COMMAND_NOTHING_REPLY");
 
+    ouput = await promise;
+  } catch (err) {
 
-  const out = command.run(interaction);
-  interaction.reply(out);
-
+  } finally {
+    interaction.reply(ouput);
+  }
 });
 
 export default client;
