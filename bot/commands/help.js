@@ -1,8 +1,9 @@
 import BaseCommand from '../modules/commands/BaseCommand.js';
-import {MessageEmbed, MessageActionRow} from 'discord.js';
-import {MessageConstructor} from '@bot/discord-util';
+import {MessageEmbed, MessageActionRow, MessagePayload} from 'discord.js';
+import DiscordUtil from '@bot/discord-util';
 
-console.log(MessageConstructor);
+const {MessageConstructor} = DiscordUtil;
+
 
 class Command extends BaseCommand {
   constructor() {
@@ -10,14 +11,8 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
-    const components = [
-      new MessageActionRow({
-        components:[{type: "BUTTON", label: "123", customId: "commands_help_test", style: 1}]
-      })
-    ];
-
-    const embeds = [new MessageEmbed({title: "123"})];
-    return { embeds, components, ephemeral: true };
+    const message = new MessageConstructor({content: "r-r-r", title: "red"});
+    return message;
   }
 
   static data = {

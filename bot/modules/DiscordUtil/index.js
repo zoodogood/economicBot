@@ -23,7 +23,7 @@ class MessageConstructor {
 
     this.content    = content;
     this.ephemeral  = ephemeral;
-    this.fetchReply = fetchReply; 
+    this.fetchReply = fetchReply;
   }
 }
 
@@ -31,9 +31,9 @@ class MessageConstructor {
 class ComponentsSimplify {
   simplify(component){
     const argumentType = [
-      component.at?(0) instanceof Array,
-      "type" in component.at?(0),
-      "type" in component
+      (component.at?.(0) instanceof Array),
+      ("type" in component.at?.(0)),
+      ("type" in component)
     ].findIndex(Boolean);
 
     if (argumentType === -1)
@@ -47,4 +47,4 @@ class ComponentsSimplify {
   }
 }
 
-export {MessageConstructor, ComponentsSimplify};
+export default {MessageConstructor, ComponentsSimplify};
