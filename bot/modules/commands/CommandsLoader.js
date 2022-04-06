@@ -3,7 +3,7 @@ import {Collection} from '@discordjs/collection';
 
 class CommandsLoader {
 
-  async load(){
+  async update(){
     const __dirname = `${ process.cwd() }`;
     globalThis.commands = new Collection();
 

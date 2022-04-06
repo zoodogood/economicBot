@@ -1,5 +1,8 @@
 import BaseCommand from '../modules/commands/BaseCommand.js';
 import {MessageEmbed, MessageActionRow} from 'discord.js';
+import {MessageConstructor} from '@bot/discord-util';
+
+console.log(MessageConstructor);
 
 class Command extends BaseCommand {
   constructor() {

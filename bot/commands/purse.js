@@ -7,9 +7,10 @@ class Command extends BaseCommand {
 
   run(interaction){
     const components = [
-      new MessageActionRow({
+      {
+        type: 'ACTION_ROW',
         components:[{type: "BUTTON", label: "123", customId: "commands_help_test", style: 1}]
-      })
+      }
     ];
 
     const embeds = [new MessageEmbed({title: "123"})];

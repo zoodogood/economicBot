@@ -3,7 +3,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 
 import CommandsLoader from './bot/modules/commands/CommandsLoader.js';
-await new CommandsLoader().load();
+await new CommandsLoader().update();
 
 
 
