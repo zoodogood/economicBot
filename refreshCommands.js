@@ -2,15 +2,20 @@ import 'dotenv/config';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 
+import CommandsLoader from './bot/modules/commands/CommandsLoader.js';
+await new CommandsLoader().load();
 
-const commands = [{
-  name: 'help',
-  description: 'Have fun!'
-}];
+
+
+const commandsData = globalThis.commands
+  .map(command => {
+    const { name, slash: {description, options, type = 1} } = command.constructor.data;
+    return {name, description, options, type};
+  })
+
+
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
-
-
 
 try {
   const clientId = (await rest.get( Routes.user() ))
@@ -18,12 +23,11 @@ try {
 
   console.info('----\nStarted refreshing application (/) commands.');
 
-  const out = await rest.put(
+  await rest.put(
     Routes.applicationCommands(clientId),
-    { body: commands },
+    { body: commandsData },
   );
 
-  console.log(out);
   console.info('Successfully reloaded application (/) commands.');
 } catch (error) {
   console.error(error);
