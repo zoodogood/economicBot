@@ -1,5 +1,6 @@
 {
   "name": "@bot/discord-util",
+  "type": "module",
   "version": "1.0.0",
   "description": "NPM local package",
   "main": "index.js",
