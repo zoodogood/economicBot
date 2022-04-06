@@ -12,13 +12,16 @@ class Command extends BaseCommand {
         components:[{type: "BUTTON", label: "123", customId: "commands_help_test", style: 1}]
       })
     ];
-    
+
     const embeds = [new MessageEmbed({title: "123"})];
     return { embeds, components, ephemeral: true };
   }
 
   static data = {
-    name: "help"
+    name: "help",
+    slash: {
+      description: "Have fun!"
+    }
   }
 }
 
