@@ -30,19 +30,29 @@ class MessageConstructor {
 
 class ComponentsSimplify {
   simplify(component){
+
+    const isComponent  = (component) => "type" in component;
+    const isActionRow  = (component) => (component instanceof Array && component.at(0)?.type) || component instanceof MessageActionRow;
+    const isComponents = (component) => component.length && isActionRow(component.at(0));
+
     const argumentType = [
-      (component.at?.(0) instanceof Array),
-      ("type" in component.at?.(0)),
-      ("type" in component)
+      isComponent(component),
+      isActionRow(component),
+      isComponents(component)
     ].findIndex(Boolean);
 
     if (argumentType === -1)
-      throw new TypeError();
+      throw new TypeError("expected component");
 
-    if (argumentType === 1)
-      component = {type: "ACTION_ROW", components: [component]}
 
-    component = new MessageActionRow(component);
+    if (argumentType === 0)
+      component = [component];
+
+    if (argumentType <= 1)
+      component = component instanceof MessageActionRow ?
+        component :
+        {type: "ACTION_ROW", components: component};
+
     return [component];
   }
 }
