@@ -2,9 +2,7 @@ import 'dotenv/config';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 
-import CommandsLoader from './bot/modules/commands/CommandsLoader.js';
-await new CommandsLoader().update();
-
+import './bot/modules/commands/initCommands.js';
 
 
 const commandsData = globalThis.commands
@@ -21,7 +19,7 @@ try {
   const clientId = (await rest.get( Routes.user() ))
     .id;
 
-  console.info('----\nStarted refreshing application (/) commands.');
+  console.info(`----\nStarted refreshing application (/) commands (${ commandsData.size })`);
 
   await rest.put(
     Routes.applicationCommands(clientId),
