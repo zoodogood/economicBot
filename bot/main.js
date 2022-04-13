@@ -1,8 +1,10 @@
 import 'dotenv/config';
 import { Client, Intents } from 'discord.js';
 
-import CommandsLoader from './modules/commands/CommandsLoader.js';
-new CommandsLoader().update();
+
+
+import './modules/events/initEvents.js';
+import './modules/commands/initCommands.js';
 
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
@@ -26,7 +28,7 @@ client.on('interactionCreate', async interaction => {
       throw new Error("UNKNOW_COMMAND");
 
     const promise = command.run(interaction);
-    
+
     const isPromise = promise instanceof Promise;
     if (isPromise && !interaction.deffered && !interaction.replied)
       throw new Error("COMMAND_NOTHING_REPLY");

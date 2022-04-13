@@ -1,5 +1,5 @@
 import fileSystem from 'fs';
-import {Collection} from '@discordjs/collection';
+import { Collection } from '@discordjs/collection';
 
 class CommandsLoader {
 
@@ -21,5 +21,4 @@ class CommandsLoader {
   }
 }
 
-
-export default CommandsLoader;
+new CommandsLoader().update();
