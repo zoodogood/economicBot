@@ -2,23 +2,27 @@ import 'dotenv/config';
 import { Client, Intents } from 'discord.js';
 
 
-
 import './modules/events/initEvents.js';
 import './modules/commands/initCommands.js';
 
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const database = globalThis.app.database;
 
 
 
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.id}!`);
+  console.log(`Ready..`);
 });
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand())
     return;
+
+  const data = {
+    userId: interaction.user
+  }
 
   const command = globalThis.commands.get(interaction.commandName);
 
@@ -26,6 +30,16 @@ client.on('interactionCreate', async interaction => {
   try {
     if (!command)
       throw new Error("UNKNOW_COMMAND");
+
+    const commandQuery = `
+      ${
+        Object.entries(data)
+          .map(([key, value]) => `SET @${ key } = "${ value }";`).join("\n")
+      }
+      ${ command.constructor.BEFORE_QUERY }
+    `;
+    const data = await database.execute(commandQuery);
+    const queryData = new QueryData({data});
 
     const promise = command.run(interaction);
 

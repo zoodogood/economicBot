@@ -6,22 +6,25 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
-    const components = [
-      new MessageActionRow({
-        components:[{type: "BUTTON", label: "123", customId: "commands_help_test", style: 1}]
-      })
-    ];
-
-    const embeds = [new MessageEmbed({title: "123"})];
-    return { embeds, components, ephemeral: true };
+    const content = "IT'S COMMAND SNIPPET. IS NOT A REAL COMMAND";
+    return { content, ephemeral: true };
   }
 
   static data = {
     name: "__NAME__",
+    // Discord SlashCommands
     slash: {
       description: "__DESCRIPTION__"
     }
   };
+
+
+  static DATABASE_QUERIES = {
+    UPDATE_COUNTER:
+      () => "UPDATE `global` SET `counter` = `counter` + 1 WHERE `id` = 1",
+    GET_COUNTER:
+      () => "SELECT `counter` FROM `global` WHERE `id` = 1"
+  }
 }
 
 

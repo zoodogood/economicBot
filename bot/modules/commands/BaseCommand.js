@@ -1,4 +1,5 @@
 import EventsEmitter from 'events';
+import QueryManager from '@database/query-manager';
 
 class BaseCommand extends EventsEmitter {
   constructor(){
@@ -14,6 +15,12 @@ class BaseCommand extends EventsEmitter {
 
   get name(){
     return this.constructor.data.name;
+  }
+
+  query(){
+    const queries = this.constructor.DATABASE_QUERIES;
+    const queryProxy = new QueryManager(queries);
+    return queryProxy;
   }
 }
 
