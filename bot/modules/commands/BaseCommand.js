@@ -7,7 +7,7 @@ class BaseCommand extends EventsEmitter {
 
   async update(){
     const __dirname = process.cwd();
-    const {Command} = await import(`file://${ __dirname }/bot/commands/${ this.name }`);
+    const {Command} = await import(`file://${ __dirname }/bot/commands/${ this.name }.js`);
     const command = new Command();
     globalThis.commands.set(this.name, command);
   }
