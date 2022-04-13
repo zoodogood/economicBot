@@ -21,4 +21,4 @@ class CommandsLoader {
   }
 }
 
-new CommandsLoader().update();
+await new CommandsLoader().update();
