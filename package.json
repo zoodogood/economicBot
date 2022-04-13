@@ -6,13 +6,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "refresh": "npm run refreshCommands.js"
+    "refresh": "node refreshCommands.js"
   },
   "author": "zoodogood",
   "license": "ISC",
   "dependencies": {
     "@bot/discord-util": "file:bot/modules/DiscordUtil",
-    "@database/query-manager": "file:database/QueryManager",
+    "@database/query-builder": "file:database/QueryBuilder",
     "@discordjs/rest": "^0.3.0",
     "@database/database": "file:database/Database",
     "discord-api-types": "^0.31.0",
