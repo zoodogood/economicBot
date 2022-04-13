@@ -31,17 +31,9 @@ client.on('interactionCreate', async interaction => {
     if (!command)
       throw new Error("UNKNOW_COMMAND");
 
-    const commandQuery = `
-      ${
-        Object.entries(data)
-          .map(([key, value]) => `SET @${ key } = "${ value }";`).join("\n")
-      }
-      ${ command.constructor.BEFORE_QUERY }
-    `;
-    const data = await database.execute(commandQuery);
-    const queryData = new QueryData({data});
 
     const promise = command.run(interaction);
+    console.log("123");
 
     const isPromise = promise instanceof Promise;
     if (isPromise && !interaction.deffered && !interaction.replied)
