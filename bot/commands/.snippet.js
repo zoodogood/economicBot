@@ -6,6 +6,10 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
+    this.query.UPDATE_COUNTER().execute();
+    const [rows: [data]] = this.query.GET_COUNTER().execute();
+    console.log( data ); // {id: 1, counter: ?}
+
     const content = "IT'S COMMAND SNIPPET. IS NOT A REAL COMMAND";
     return { content, ephemeral: true };
   }
