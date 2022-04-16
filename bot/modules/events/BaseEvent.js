@@ -1,7 +1,15 @@
 class BaseEvent {
+  #callback;
+  #eventTarget;
+  #eventName;
+
   constructor(target, eventName, {once = false} = {}){
     let handlerType = once ? "once" : "on";
-    target[handlerType](eventName, this.beforeRun.bind(this));
+
+    this.#eventTarget = target;
+    this.#eventName = eventName;
+    this.#callback = this.beforeRun.bind(this);
+    target[handlerType](eventName, this.#callback);
   }
 
   beforeRun(...args){
@@ -10,6 +18,10 @@ class BaseEvent {
       return;
 
     this.run(...args);
+  }
+
+  remove(){
+    this.#eventTarget.removeListener(this.eventName, this.#callback);
   }
 }
 
