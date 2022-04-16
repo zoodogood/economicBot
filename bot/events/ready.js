@@ -10,7 +10,7 @@ class Event extends BaseEvent {
 
     const timeSlice = process.uptime();
     const data = this.constructor.getDisplayData();
-    console.info(this.constructor.COLORS.cyan, `\n\nLaunched in ${ timeSlice }ms:`);
+    console.info(this.constructor.COLORS.cyan, `\n\nLaunched in ${ timeSlice * 1000 }ms:`);
 
     console.table({bot: data.bot});
     console.table({database: data.database});
@@ -19,9 +19,17 @@ class Event extends BaseEvent {
   }
 
   static getDisplayData(){
+    const client = globalThis.app.client;
+
     return {
-      bot: {users: 12, guilds: 1, commands: 3, events: 2},
-      database: {users: 1, cash: 1}
+      bot: {
+        guilds:   client.guilds.cache.size,
+        commands: globalThis.commands.size,
+        events:   globalThis.events.size
+      },
+      database: {
+        users: 1, cash: 1
+      }
     }
   }
 
