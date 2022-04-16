@@ -11,6 +11,7 @@ class QueryBuilder {
       if (prop === "execute")
         return this.getExecutor(target);
 
+
       if (!(prop in target))
         return undefined;
 
@@ -27,12 +28,14 @@ class QueryBuilder {
     return proxy();
   }
 
+
   getExecutor(query){
     if (typeof query !== "string")
       throw new TypeError("A getExecutor must be used with string-SQL Query");
 
     return this.#execute.bind(this, query);
   }
+
 
   #execute(query){
     return this.#database.execute(query);
