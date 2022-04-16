@@ -1,47 +1,16 @@
 import 'dotenv/config';
 import { Client, Intents } from 'discord.js';
 
-
-import './modules/events/initEvents.js';
-import './modules/commands/initCommands.js';
-
-
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+globalThis.events.emit("bot/clientAvailable", client);
+
 const database = globalThis.app.database;
 
+await import( './modules/events/initEvents.js' );
+await import( './modules/commands/initCommands.js' );
 
 
 
-client.on('ready', () => {
-  console.log(`Ready..`);
-});
-
-client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand())
-    return;
-
-  const data = {
-    userId: interaction.user
-  }
-
-  const command = globalThis.commands.get(interaction.commandName);
-
-  let reply = {ephemeral: true};
-  try {
-    if (!command)
-      throw new Error("UNKNOW_COMMAND");
-
-
-    const promise = command.run(interaction);
-    reply = await promise;
-    
-  } catch (err) {
-    reply.content = err.message;
-
-  } finally {
-    interaction.reply(reply);
-  }
-});
 
 export default client;
 client.login(process.env.TOKEN);
