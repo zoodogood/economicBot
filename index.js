@@ -1,6 +1,8 @@
-console.clear();
 import 'dotenv/config';
 import Database from '@database/database';
+
+import EventsEmitter from 'events';
+globalThis.events = new EventsEmitter();
 
 
 class App {
@@ -25,8 +27,10 @@ class App {
   }
 
   async initClient(){
-    const client = await import('./bot/main.js');
-    this.client = client;
+    globalThis.events.on("bot/clientAvailable", client => {
+      this.client = client;
+    });
+    await import('./bot/main.js');
   }
 }
 
