@@ -6,8 +6,6 @@ class Command extends BaseCommand {
   }
 
   async run(interaction){
-    interaction.deferReply({ ephemeral: true, fetchReply: true });
-
     await this.query.UPDATE_COUNTER.execute();
     const [rows] = await this.query.GET_COUNTER.execute();
     const value = rows.at(0);
