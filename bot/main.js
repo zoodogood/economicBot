@@ -33,13 +33,8 @@ client.on('interactionCreate', async interaction => {
 
 
     const promise = command.run(interaction);
-    console.log("123");
-
-    const isPromise = promise instanceof Promise;
-    if (isPromise && !interaction.deffered && !interaction.replied)
-      throw new Error("COMMAND_NOTHING_REPLY");
-
     reply = await promise;
+    
   } catch (err) {
     reply.content = err.message;
 
