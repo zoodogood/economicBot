@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import Database from '@database/database';
+import Locales from '@global/locales';
 
 import EventsEmitter from 'events';
 globalThis.events = new EventsEmitter();
@@ -8,11 +9,13 @@ globalThis.events = new EventsEmitter();
 class App {
 
   async load(){
-    await this.initDatabase();
+    const modules = ["initDatabase", "initLocales", "initClient"];
+    for (const initName of modules){
+      console.time(initName);
+      await this[initName]();
 
-    await this.initClient();
-
-
+      console.timeEnd(initName);
+    }
   }
 
   async initDatabase(){
@@ -31,6 +34,11 @@ class App {
       this.client = client;
     });
     await import('./bot/main.js');
+  }
+
+  async initLocales(){
+    const locales = new Locales();
+    globalThis.locales = locales.manager.bind(locales);
   }
 }
 
