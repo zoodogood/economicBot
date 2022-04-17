@@ -5,7 +5,7 @@ class EventsLoader {
 
   async update(){
     const __dirname = `${ process.cwd() }`;
-    globalThis.commands = new Collection();
+    globalThis.eventsList = new Collection();
 
     const files = fileSystem.readdirSync(`${ __dirname }/bot/events/`)
       .filter(name => /^[a-zA-Z].+?\.js/.test(name));
@@ -15,7 +15,7 @@ class EventsLoader {
       const event = new Event();
 
 
-      globalThis.commands.set(event.name, event);
+      globalThis.eventsList.set(name, event);
     }
 
     return;
