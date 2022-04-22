@@ -12,8 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@bot/discord-util": "file:bot/modules/DiscordUtil",
-    "@database/database": "file:database/Database",
-    "@database/query-builder": "file:database/QueryBuilder",
+    "@database/database": "file:modules/database/Database",
+    "@database/query-builder": "file:modules/database/QueryBuilder",
     "@discordjs/rest": "^0.3.0",
     "@global/locales": "file:locales",
     "discord-api-types": "^0.31.0",
