@@ -13,17 +13,21 @@ class Event extends BaseEvent {
     const command = globalThis.commands.get(interaction.commandName);
     let reply = {ephemeral: true};
 
-    try {
+    try
+    {
       if (!command)
         throw new Error("UNKNOW_COMMAND");
 
       const promise = command.run(interaction);
       reply = await promise;
 
-    } catch (err) {
+    }
+    catch (err)
+    {
       reply.content = err.message;
-
-    } finally {
+    }
+    finally
+    {
       interaction.reply(reply);
     };
 
