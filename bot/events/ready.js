@@ -10,13 +10,13 @@ class Event extends BaseEvent {
 
     const timeSlice = process.uptime();
     const data = this.constructor.getDisplayData();
-    console.info(this.constructor.COLORS.green, `\n\nLaunched in ${ timeSlice * 1000 }ms:`);
+    console.info(this.constructor.COLORS.green, `${ "\n".repeat(4) }Launched in ${ timeSlice * 1000 }ms:`);
 
     console.table({bot: data.bot});
     console.table({database: data.database});
 
     console.info(this.constructor.COLORS.green, "────────");
-    console.log(globalThis.locales("ru-ru").commands.test);
+    console.info( "\n".repeat(4) );
   }
 
   static getDisplayData(){
