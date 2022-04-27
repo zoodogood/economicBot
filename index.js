@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import Database from '@database/database';
-import Locales from '@global/locales';
+import LocalesStructure from '@global/locales';
 
 import EventsEmitter from 'events';
 globalThis.events = new EventsEmitter();
@@ -26,7 +26,13 @@ class App {
       DATABASE_NAME: database
     } = process.env;
 
-    this.database = new Database({ user, password, host, database });
+    this.database = await new Database({ user, password, host, database })
+      .whenPool;
+
+    if (this.database === undefined){
+      console.error("The database did not pass the startup check.\nExit");
+      process.exit(1);
+    }
   }
 
   async initClient(){
@@ -37,8 +43,8 @@ class App {
   }
 
   async initLocales(){
-    const locales = new Locales();
-    globalThis.locales = locales.manager.bind(locales);
+    const locales = new LocalesStructure();
+    globalThis.locales = locales.builder.bind(locales);
   }
 }
 

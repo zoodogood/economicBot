@@ -1,15 +1,45 @@
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname( fileURLToPath(import.meta.url) );
+
 import FileSystem from 'fs';
 import { VM } from 'vm2';
 
-class Locales {
+
+class LocalesStructure {
 
   constructor(){
     this.categories = {};
-    this.#parse();
+    this.filesPaths = this.#searchFiles();
+    //this.#parse();
   }
 
+  #searchFiles(){
+    const basePath = this.constructor.FOLDER;
 
-  manager(userLocale){
+    const files = [];
+    const queue = [basePath];
+
+    const readDirectory = (path) => {
+      const directoryFiles = FileSystem.readdirSync(`${ __dirname }/${ path }`)
+        .map(name => `${ path }/${ name }`);
+
+      for (const file of directoryFiles){
+        const receiver = FileSystem.lstatSync(`${ __dirname }/${ file }`).isDirectory()
+          ? queue : files;
+
+        receiver.push(file);
+      }
+    }
+
+    while (queue.length)
+      readDirectory( queue.shift() );
+
+    return files;
+  }
+
+  builder(userLocale){
     const getCategory = (_, prop) => {
       if (!(prop in this.categories))
         return undefined;
@@ -82,16 +112,18 @@ class Locales {
 
 
   #handleLine(line){
-    console.time();
-    const value = "2+2";
-    console.timeEnd();
-    console.log(value);
+
   }
 
-  static PATH = `${ process.cwd() }/locales/languages`;
-
   static defaultLocale = "ru-ru";
+
+  static FOLDER = "./languages";
 }
 
+class LocaleContent {
+  constructor(path){
 
-export default Locales;
+  }
+}
+
+export default LocalesStructure;

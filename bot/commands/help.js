@@ -11,8 +11,12 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
-    const message = new MessageConstructor({content: "r-r-r", title: "red", components: {style: 1, type: 2, customId: "command_help_test", label: "typein" }});
+    const message = new MessageConstructor({content: "r-r-r", title: "red", components: {style: 1, type: 2, customId: "command_help_Test", label: "typein" }});
     return message;
+  }
+
+  onTest(interaction){
+    return {content: interaction.user.username + interaction.locale};
   }
 
   static data = {
