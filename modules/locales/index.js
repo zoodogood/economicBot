@@ -146,6 +146,7 @@ class LocaleContent {
     const key       = "[a-zA-Z_$]+";
     const content   = "(?:.|\\n)+?";
     const end       = `(?=(?:\\s|\\n)*(?:${ key }\\s*${ separator }|$))`;
+    // out
 
     const plain = `\n\s*(${ key })\\s*(${ separator })\\s*\\n?(${ content })${ end }`;
     return new RegExp(plain, "g");
