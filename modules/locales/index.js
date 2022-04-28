@@ -10,6 +10,13 @@ function isTranslateFile(path){
   return INDICATOR.test( path );
 }
 
+function disassemblePath(path){
+  const baseLength = LocalesStructure.FOLDER.split("/").length;
+  path = path.split("/").slice(baseLength);
+  path[path.length - 1] = path.at(-1).replace(".ini", "");
+  return path;
+}
+
 class LocalesStructure {
 
   constructor(){
@@ -45,7 +52,24 @@ class LocalesStructure {
   }
 
   #setLocales(){
+    const structure = {};
+
     const locales = this.filesPaths.map(path => new LocaleContent(path));
+    locales.forEach(({path, lines}) => {
+      path = disassemblePath(path);
+      console.log(path);
+
+      let currentPosition = structure;
+      for (const property of path)
+        currentPosition = currentPosition[ property ] ||= {};
+
+      for (const line of lines)
+        currentPosition[ line.key ] = { type: line.type, value: line.value };
+
+    });
+    console.log(structure);
+    debugger;
+
   }
 
   builder(userLocale){
@@ -102,6 +126,7 @@ class LocaleContent {
 
     const lineRegex = this.constructor.getLineRegex();
     const matched = [...plainText.matchAll(lineRegex)];
+    console.log({matched});
 
     const lines = matched.map(([full, key, separator, value]) => {
       const line = {};
@@ -111,6 +136,7 @@ class LocaleContent {
       return line;
     });
 
+    console.log({lines});
     return lines;
   }
 
@@ -126,5 +152,7 @@ class LocaleContent {
   }
 }
 
+new LocaleContent("./languages/ru/commands/info.ini")
+debugger;
 
 export default LocalesStructure;
