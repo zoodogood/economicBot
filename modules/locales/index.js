@@ -1,18 +1,23 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-
 const __dirname = dirname( fileURLToPath(import.meta.url) );
 
 import FileSystem from 'fs';
 import { VM } from 'vm2';
 
+function isTranslateFile(path){
+  const INDICATOR = /.+?\.ini$/;
+  return INDICATOR.test( path );
+}
 
 class LocalesStructure {
 
   constructor(){
     this.categories = {};
-    this.filesPaths = this.#searchFiles();
-    //this.#parse();
+    this.filesPaths = this.#searchFiles()
+      .filter(isTranslateFile);
+
+    this.#setLocales();
   }
 
   #searchFiles(){
@@ -39,6 +44,10 @@ class LocalesStructure {
     return files;
   }
 
+  #setLocales(){
+    const locales = this.filesPaths.map(path => new LocaleContent(path));
+  }
+
   builder(userLocale){
     const getCategory = (_, prop) => {
       if (!(prop in this.categories))
@@ -61,69 +70,61 @@ class LocalesStructure {
       if (line === undefined)
         return undefined;
 
-      return this.#handleLine(line);
+      return this.handleLine(line);
     }
     return new Proxy({}, {get: getCategory});
   }
 
 
-  #parse(){
-    const locales = FileSystem.readdirSync(this.constructor.PATH)
-      .filter(name => /.+?\.ini$/.test(name));
 
-    for (const name of locales)
-      this.#parseFile(name);
-  }
-
-  #parseFile(fileName){
-    const category = /\[.+?\]/;
-
-    const path = `${ this.constructor.PATH }/${fileName}`;
-    const plainCategories = FileSystem.readFileSync(path, "utf-8")
-      .split(
-        new RegExp(`(?=${ category }|(?:\s*$))`, "g")
-      )
-      .filter(plain => category.test(plain));
-
-    plainCategories.forEach(plain => {
-      const categoryName = plain.match(category).at(0)
-        .slice(1, -1)
-        .trim();
-
-      const lines = plain.match(/[a-zA-Z].*?=(?:.+)/g);
-      if (lines === null)
-        return;
-
-      this.categories[categoryName] ||= {};
-
-      const localeName = fileName.split(".").at(0);
-
-
-      const entries = Object.fromEntries( lines.map(this.#parseLine) );
-      this.categories[categoryName][localeName] = entries;
-    });
-  }
-
-  #parseLine(line){
-    const [key, ...value] = line.split("=");
-    return [key, value.join("=")];
-  }
-
-
-
-  #handleLine(line){
-
-  }
-
-  static defaultLocale = "ru-ru";
+  static defaultLocale = "ru";
 
   static FOLDER = "./languages";
 }
 
 class LocaleContent {
   constructor(path){
+    this.path = path;
+    this.plainText = this.#readFile();
 
+    this.lines = this.#parse(this.plainText);
+  }
+
+
+  #readFile(){
+    return FileSystem.readFileSync(`${ __dirname }/${ this.path }`, "utf-8");
+  }
+
+
+  #parse(plainText){
+    const commentRegex = /(?:^|\n)\/\/.+/g;
+    plainText = plainText.replaceAll(commentRegex, "");
+
+    const lineRegex = this.constructor.getLineRegex();
+    const matched = [...plainText.matchAll(lineRegex)];
+
+    const lines = matched.map(([full, key, separator, value]) => {
+      const line = {};
+      line.key   = key;
+      line.value = value;
+      line.type  = separator.length - 1; // variants =, =*, =**
+      return line;
+    });
+
+    return lines;
+  }
+
+
+  static getLineRegex(){
+    const separator = "=\\*?\\*?";
+    const key       = "[a-zA-Z_$]+";
+    const content   = "(?:.|\\n)+?";
+    const end       = `(?=(?:\\s|\\n)*(?:${ key }\\s*${ separator }|$))`;
+
+    const plain = `\n\s*(${ key })\\s*(${ separator })\\s*\\n?(${ content })${ end }`;
+    return new RegExp(plain, "g");
   }
 }
+
 
 export default LocalesStructure;
