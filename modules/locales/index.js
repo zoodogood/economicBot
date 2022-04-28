@@ -5,6 +5,7 @@ const __dirname = dirname( fileURLToPath(import.meta.url) );
 import FileSystem from 'fs';
 import { VM } from 'vm2';
 
+
 function isTranslateFile(path){
   const INDICATOR = /.+?\.ini$/;
   return INDICATOR.test( path );
@@ -16,6 +17,9 @@ function disassemblePath(path){
   path[path.length - 1] = path.at(-1).replace(".ini", "");
   return path;
 }
+
+
+
 
 class LocalesStructure {
 
@@ -57,7 +61,6 @@ class LocalesStructure {
     const locales = this.filesPaths.map(path => new LocaleContent(path));
     locales.forEach(({path, lines}) => {
       path = disassemblePath(path);
-      console.log(path);
 
       let currentPosition = structure;
       for (const property of path)
@@ -67,44 +70,21 @@ class LocalesStructure {
         currentPosition[ line.key ] = { type: line.type, value: line.value };
 
     });
-    console.log(structure);
-    debugger;
 
+    this.locales = structure;
   }
 
   builder(userLocale){
-    const getCategory = (_, prop) => {
-      if (!(prop in this.categories))
-        return undefined;
-
-      const properties = this.categories[ prop ];
-      return new Proxy(properties, {get: getContent});
-    }
-
-    const getContent = (locales, prop) => {
-
-      const locale = locales[userLocale] && (prop in locales[userLocale]) ?
-        userLocale :
-        this.constructor.defaultLocale;
-
-
-
-      const line = locales[locale][prop];
-
-      if (line === undefined)
-        return undefined;
-
-      return this.handleLine(line);
-    }
-    return new Proxy({}, {get: getCategory});
+    return new LocaleBuilder(this.locales, userLocale);
   }
 
 
-
-  static defaultLocale = "ru";
-
   static FOLDER = "./languages";
 }
+
+
+
+
 
 class LocaleContent {
   constructor(path){
@@ -126,7 +106,6 @@ class LocaleContent {
 
     const lineRegex = this.constructor.getLineRegex();
     const matched = [...plainText.matchAll(lineRegex)];
-    console.log({matched});
 
     const lines = matched.map(([full, key, separator, value]) => {
       const line = {};
@@ -136,7 +115,6 @@ class LocaleContent {
       return line;
     });
 
-    console.log({lines});
     return lines;
   }
 
@@ -146,14 +124,21 @@ class LocaleContent {
     const key       = "[a-zA-Z_$]+";
     const content   = "(?:.|\\n)+?";
     const end       = `(?=(?:\\s|\\n)*(?:${ key }\\s*${ separator }|$))`;
-    // out
 
-    const plain = `\n\s*(${ key })\\s*(${ separator })\\s*\\n?(${ content })${ end }`;
+    const plain = `(?:\\n|\\s)*(${ key })\\s*(${ separator })\\s*\\n?(${ content })${ end }`;
     return new RegExp(plain, "g");
   }
 }
 
-new LocaleContent("./languages/ru/commands/info.ini")
-debugger;
+class LocaleBuilder {
+  constructor(structure){
+
+  }
+
+  static defaultLocale = "ru";
+}
+
+
+
 
 export default LocalesStructure;
