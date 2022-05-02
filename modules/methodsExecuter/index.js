@@ -1,29 +1,26 @@
 /***
   @useExample
-  new MethodsExecuter().execute("command_help_MainButton", ...args);
-  it's apply globalThis.commands.get("help").onMainButton.apply(<this>, args);
+  new MethodsExecuter().execute("command.help.onMainButton", ...args);
+  it's apply globalThis.commands.get("help").onMainButton.apply(<this>, [...rest], args);
 */
 
 class MethodsExecuter {
   execute(expression, ...args){
     const  [type, identify, method, ...rest] = expression.split( this.constructor.SEPARATOR );
-    if (rest.length > 0)
-      console.warn( new TypeError("A string of 3 arguments is expected. Rest parameters ignored") );
 
     const component = this.constructor.supportedComponents[type];
     const list = typeof component.list === "function" ?
       component.list(this) : component.list;
 
     const target = component.getTarget(list, identify);
-    return this.#executer(target, method, ...args);
+    return this.#executer(target, method, rest, ...args);
   }
 
-  #executer(target, method, ...args){
-    method = `on${ method }`;
+  #executer(target, method, rest, ...args){
     if (!( method in target))
       throw new Error(`${ target.constructor.name }, ${ method } is undefined`);
 
-    return target[ method ].apply(target, args);
+    return target[ method ].call(target, rest, ...args);
   }
 
 
@@ -42,7 +39,7 @@ class MethodsExecuter {
     // }
   };
 
-  static SEPARATOR = "_";
+  static SEPARATOR = ".";
 }
 
 export default MethodsExecuter;
