@@ -11,7 +11,7 @@ class BuilderContext {
     this.data = {};
     this.data.args = args;
 
-    this.state = 0;
+    this.state = this.constructor.BUILDER_STATES._DEFAULT ?? 0;
   }
 
   get stateAPI(){
