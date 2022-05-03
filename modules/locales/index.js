@@ -5,6 +5,7 @@ const __dirname = dirname( fileURLToPath(import.meta.url) );
 import BaseBuilder from '@global/base-builder'
 import FileSystem from 'fs';
 import { VM } from 'vm2';
+import Util from '@global/util';
 
 
 function isTranslateFile(path){
@@ -76,7 +77,7 @@ class LocalesStructure {
   }
 
   build(){
-    return new LocaleBuilder(this.locales).build(userLocale);
+    return new LocaleBuilder(this.locales).build();
   }
 
 
@@ -136,7 +137,7 @@ class LocaleContent {
 
 
 class LocaleBuilder extends BaseBuilder {
-  constructor(){
+  constructor(structure){
     super();
     this.structure = structure;
     this.locale = this.constructor.defaultLocale;
@@ -146,7 +147,7 @@ class LocaleBuilder extends BaseBuilder {
     if (!(way instanceof Array))
       throw new TypeError("Way must be Array");
 
-    let current = this.locale;
+    let current = this.structure;
     for (const point of way)
       current = current?.[ point ];
 
@@ -155,25 +156,24 @@ class LocaleBuilder extends BaseBuilder {
         this.lineResolver(way, null) :
         undefined;
 
-    if (this.constructor.isEnd(current))
+    if (!this.constructor.isEnd(current))
       throw new Error("incomplete way");
 
     return this.#resolveLine.bind(this, current);
   }
 
   build(){
-    const startPoint = this.locale[ this.constructor.defaultLocale ];
+    const startPoint = this.structure[ this.constructor.defaultLocale ];
     const params = {
       builder: this,
       point: startPoint,
       isEnd: this.constructor.isEnd,
       way: []
     }
-    const proxied = super.build();
-    return this.#builderProxy(startPoint);
+    const proxied = super.build(params);
+    return proxied;
   }
 
-  // locale: <string, "ru-ru">
   setLocale(locale){
     if (typeof locale !== "string")
       throw new TypeError("expected locale name");
@@ -188,17 +188,33 @@ class LocaleBuilder extends BaseBuilder {
   }
 
 
-  // line: {key: <string>, type: <0-2>, value: <string>}
-  #lineResolver(line, ...args){
+  // line: {type: <0-2>, value: <string>}
+  #resolveLine(line, ...args){
+    switch (line.type) {
+      case 1:
+        line.value = line.value.replaceAll(/(?<!\\)\{\{.+?\}\}/g, () => args.shift());
+        break;
 
+      case 2:
+        const vm = new VM({ sandbox: {Util, args} });
+        line.value = vm.run(`\`${ line.value }\``);
+        break;
+    }
+    return line.value;
   }
 
+  static BUILDER_STATES = {
+    END: 0,
+    _DEFAULT: 1
+  };
 
-  static BUILDER_METHODS = {
+
+  static BUILDER_METHODS = [
     {
       type: "get",
       callback: function(target, name){
           const {point} = this.data;
+
           if (name in point){
             this.data.way.push(name);
             this.data.point = point[ name ];
@@ -212,8 +228,8 @@ class LocaleBuilder extends BaseBuilder {
       type: "get",
       callback: function(target, name){
           const {point, isEnd} = this.data;
-          if (isEnd(point)){
-            this.stateAPI.set( this.constructor.BUILDER_STATES.END );
+          if ( isEnd(point) ){
+            this.stateAPI.set( LocaleBuilder.BUILDER_STATES.END );
           }
       }
     },
@@ -225,7 +241,7 @@ class LocaleBuilder extends BaseBuilder {
           const way = [builder.locale, ...this.data.way];
 
           const resolver = builder.lineResolver(way, builder.locale);
-          const value = resolver.apply(point, args);
+          const value = resolver(point, ...args);
           this.complete(value);
       }
     },
@@ -236,12 +252,9 @@ class LocaleBuilder extends BaseBuilder {
           this.data.builder.setLocale(locale);
       }
     }
-  };
+  ];
 
-  BUILDER_STATES = {
-    END: 0,
-    _DEFAULT: 1
-  };
+
 
   static isEnd = (obj) => "value" in obj && "type" in obj;
   static defaultLocale = "ru";
@@ -251,3 +264,7 @@ class LocaleBuilder extends BaseBuilder {
 
 
 export default LocalesStructure;
+
+
+const structure = new LocalesStructure();
+console.table(structure.build().commands.help.x());

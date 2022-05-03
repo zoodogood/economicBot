@@ -7,11 +7,9 @@ const proxied = new SimpleBuilder().build(data);
 */
 
 class BuilderContext {
-  constructor(...args){
-    this.data = {};
-    this.data.args = args;
-
-    this.state = this.constructor.BUILDER_STATES._DEFAULT ?? 0;
+  constructor(data){
+    this.data = data;
+    this.state = 0;
   }
 
   get stateAPI(){
@@ -25,7 +23,7 @@ class BuilderContext {
   }
 
   complete(value){
-    this.complete = value;
+    this.completeValue = value;
   }
 }
 
@@ -34,6 +32,10 @@ class BuilderContext {
 class BaseBuilder {
   build(...args){
     const context = new this.constructor.BuilderContext(...args);
+
+    const state = this.constructor.BUILDER_STATES._DEFAULT ?? 0;
+    context.stateAPI.set( state );
+
     return this.#proxy(context);
   }
 
@@ -41,7 +43,7 @@ class BaseBuilder {
   #proxy(context){
     const boop = () => {};
     const traps = Object.fromEntries(
-      this.constructor.#TRAPS
+      this.constructor.TRAPS
       .map(this.#proxyHandler.bind(this, context))
     );
 
@@ -54,16 +56,17 @@ class BaseBuilder {
       .filter(({type}) => type === key);
 
     const callback = (...args) => {
-      methods.filter(method => context.stateAPI.has(method.state));
-      methods.forEach(method => method.callback.apply(context, args));
-      return context.complete ?? this.#proxy();
+      methods.filter(method => context.stateAPI.has(method.state ?? 0))
+        .forEach(method => method.callback.apply(context, args));
+        
+
+      return ("completeValue" in context) ?
+        context.completeValue :
+        this.#proxy(context);
     };
     return [key, callback];
   }
 
-
-  // { type: "get", callback: <proxyTrap>, state?: <bit> }
-  static BUILDER_METHODS = [];
 
   // { <key>: <bit> }
   // @example {USER: 1, MODERATOR: 2, ADMIN: 4, ALL: 7}
@@ -71,7 +74,13 @@ class BaseBuilder {
     _DEFAULT: 0
   };
 
-  static #TRAPS = ["get", "set", "has", "apply", "construct", "deleteProperty", "defineProperty", "ownKeys", "getOwnPropertyDescriptor", "preventExtensions"];
+
+  // { type: "get", callback: <proxyTrap>, state?: <bit> }
+  static BUILDER_METHODS = [];
+
+
+
+  static TRAPS = ["get", "set", "has", "apply", "construct", "deleteProperty", "defineProperty", "ownKeys", "getOwnPropertyDescriptor", "preventExtensions"];
 
   static BuilderContext = BuilderContext;
 }
