@@ -267,4 +267,3 @@ export default LocalesStructure;
 
 
 const structure = new LocalesStructure();
-console.table(structure.build().commands.help.x());
