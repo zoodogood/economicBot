@@ -65,7 +65,7 @@ class BaseBuilder {
   // { type: "get", callback: <proxyTrap>, state?: <bit> }
   static BUILDER_METHODS = [];
 
-  // { KEY: <bit> }
+  // { <key>: <bit> }
   // @example {USER: 1, MODERATOR: 2, ADMIN: 4, OWNER: 7}
   static BUILDER_STATES = {};
 
