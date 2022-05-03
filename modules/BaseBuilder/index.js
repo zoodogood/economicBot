@@ -67,7 +67,9 @@ class BaseBuilder {
 
   // { <key>: <bit> }
   // @example {USER: 1, MODERATOR: 2, ADMIN: 4, ALL: 7}
-  static BUILDER_STATES = {};
+  static BUILDER_STATES = {
+    _DEFAULT: 0
+  };
 
   static #TRAPS = ["get", "set", "has", "apply", "construct", "deleteProperty", "defineProperty", "ownKeys", "getOwnPropertyDescriptor", "preventExtensions"];
 
