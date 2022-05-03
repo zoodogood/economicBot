@@ -33,7 +33,7 @@ class BuilderContext {
 
 class BaseBuilder {
   build(...args){
-    const context = new BuilderContext(...args);
+    const context = new this.constructor.BuilderContext(...args);
     return this.#proxy(context);
   }
 
@@ -66,7 +66,7 @@ class BaseBuilder {
   static BUILDER_METHODS = [];
 
   // { <key>: <bit> }
-  // @example {USER: 1, MODERATOR: 2, ADMIN: 4, OWNER: 7}
+  // @example {USER: 1, MODERATOR: 2, ADMIN: 4, ALL: 7}
   static BUILDER_STATES = {};
 
   static #TRAPS = ["get", "set", "has", "apply", "construct", "deleteProperty", "defineProperty", "ownKeys", "getOwnPropertyDescriptor", "preventExtensions"];
