@@ -2,6 +2,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname( fileURLToPath(import.meta.url) );
 
+import BaseBuilder from '@global/base-builder'
 import FileSystem from 'fs';
 import { VM } from 'vm2';
 
@@ -74,8 +75,8 @@ class LocalesStructure {
     this.locales = structure;
   }
 
-  builder(userLocale){
-    return new LocaleBuilder(this.locales, userLocale);
+  build(){
+    return new LocaleBuilder(this.locales).build(userLocale);
   }
 
 
@@ -130,11 +131,119 @@ class LocaleContent {
   }
 }
 
-class LocaleBuilder {
-  constructor(structure){
+
+
+
+
+class LocaleBuilder extends BaseBuilder {
+  constructor(){
+    super();
+    this.structure = structure;
+    this.locale = this.constructor.defaultLocale;
+  }
+
+  lineResolver(way, selectLocale){
+    if (!(way instanceof Array))
+      throw new TypeError("Way must be Array");
+
+    let current = this.locale;
+    for (const point of way)
+      current = current?.[ point ];
+
+    if (current === undefined)
+      return selectLocale !== this.constructor.defaultLocale ?
+        this.lineResolver(way, null) :
+        undefined;
+
+    if (this.constructor.isEnd(current))
+      throw new Error("incomplete way");
+
+    return this.#resolveLine.bind(this, current);
+  }
+
+  build(){
+    const startPoint = this.locale[ this.constructor.defaultLocale ];
+    const params = {
+      builder: this,
+      point: startPoint,
+      isEnd: this.constructor.isEnd,
+      way: []
+    }
+    const proxied = super.build();
+    return this.#builderProxy(startPoint);
+  }
+
+  // locale: <string, "ru-ru">
+  setLocale(locale){
+    if (typeof locale !== "string")
+      throw new TypeError("expected locale name");
+
+    if (!(locale in this.structure)){
+      const expectedLocales = Object.keys(this.structure);
+      throw new Error(`Cannot find ${ locale } of [${ expectedLocales.join(", ") }]`);
+    }
+
+
+    this.locale = locale;
+  }
+
+
+  // line: {key: <string>, type: <0-2>, value: <string>}
+  #lineResolver(line, ...args){
 
   }
 
+
+  static BUILDER_METHODS = {
+    {
+      type: "get",
+      callback: function(target, name){
+          const {point} = this.data;
+          if (name in point){
+            this.data.way.push(name);
+            this.data.point = point[ name ];
+            return;
+          }
+
+          return this.complete(undefined);
+      }
+    },
+    {
+      type: "get",
+      callback: function(target, name){
+          const {point, isEnd} = this.data;
+          if (isEnd(point)){
+            this.stateAPI.set( this.constructor.BUILDER_STATES.END );
+          }
+      }
+    },
+    {
+      type: "apply",
+      state: this.BUILDER_STATES.END,
+      callback: function(target, thisContext, ...args){
+          const {builder, point} = this.data;
+          const way = [builder.locale, ...this.data.way];
+
+          const resolver = builder.lineResolver(way, builder.locale);
+          const value = resolver.apply(point, args);
+          this.complete(value);
+      }
+    },
+    {
+      type: "apply",
+      state: this.BUILDER_STATES._DEFAULT,
+      callback: function(target, thisContext, locale){
+          this.data.builder.setLocale(locale);
+      }
+    }
+  };
+
+  BUILDER_STATES = {
+    END: 0,
+    _DEFAULT: 1
+  };
+
+  static isEnd = (obj) => "value" in obj && "type" in obj;
   static defaultLocale = "ru";
 }
 
