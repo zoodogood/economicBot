@@ -27,6 +27,9 @@ class BaseCommand extends EventsEmitter {
 
   i18n(locale, key, ...args){
     const resolver = globalThis.i18n.api().lineResolver(["commands", this.name, key], locale);
+    if (resolver === null)
+      return undefined;
+
     return resolver(...args);
   }
 }
