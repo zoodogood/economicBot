@@ -2,8 +2,8 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname( fileURLToPath(import.meta.url) );
 
-import BaseBuilder from '@global/base-builder'
 import FileSystem from 'fs';
+
 import { VM } from 'vm2';
 import Util from '@global/util';
 
