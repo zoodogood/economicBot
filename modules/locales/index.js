@@ -76,8 +76,8 @@ class LocalesStructure {
     this.locales = structure;
   }
 
-  build(){
-    return new LocaleBuilder(this.locales).build();
+  api(){
+    return new I18nAPI(this.locales);
   }
 
 
@@ -136,9 +136,8 @@ class LocaleContent {
 
 
 
-class LocaleBuilder extends BaseBuilder {
+class I18nAPI {
   constructor(structure){
-    super();
     this.structure = structure;
     this.locale = this.constructor.defaultLocale;
   }
@@ -154,37 +153,19 @@ class LocaleBuilder extends BaseBuilder {
     if (current === undefined)
       return selectLocale !== this.constructor.defaultLocale ?
         this.lineResolver(way, null) :
-        undefined;
+        null;
 
-    if (!this.constructor.isEnd(current))
+    if (!this.isEnd(current))
       throw new Error("incomplete way");
 
     return this.#resolveLine.bind(this, current);
   }
 
-  build(){
-    const startPoint = this.structure[ this.constructor.defaultLocale ];
-    const params = {
-      builder: this,
-      point: startPoint,
-      isEnd: this.constructor.isEnd,
-      way: []
-    }
-    const proxied = super.build(params);
-    return proxied;
-  }
-
-  setLocale(locale){
+  isLocaleExits(locale){
     if (typeof locale !== "string")
       throw new TypeError("expected locale name");
 
-    if (!(locale in this.structure)){
-      const expectedLocales = Object.keys(this.structure);
-      throw new Error(`Cannot find ${ locale } of [${ expectedLocales.join(", ") }]`);
-    }
-
-
-    this.locale = locale;
+    return locale in this.structure;
   }
 
 
@@ -203,60 +184,11 @@ class LocaleBuilder extends BaseBuilder {
     return line.value;
   }
 
-  static BUILDER_STATES = {
-    END: 0,
-    _DEFAULT: 1
-  };
 
+  isEnd(point){
+    return "value" in point && "type" in point;
+  }
 
-  static BUILDER_METHODS = [
-    {
-      type: "get",
-      callback: function(target, name){
-          const {point} = this.data;
-
-          if (name in point){
-            this.data.way.push(name);
-            this.data.point = point[ name ];
-            return;
-          }
-
-          return this.complete(undefined);
-      }
-    },
-    {
-      type: "get",
-      callback: function(target, name){
-          const {point, isEnd} = this.data;
-          if ( isEnd(point) ){
-            this.stateAPI.set( LocaleBuilder.BUILDER_STATES.END );
-          }
-      }
-    },
-    {
-      type: "apply",
-      state: this.BUILDER_STATES.END,
-      callback: function(target, thisContext, ...args){
-          const {builder, point} = this.data;
-          const way = [builder.locale, ...this.data.way];
-
-          const resolver = builder.lineResolver(way, builder.locale);
-          const value = resolver(point, ...args);
-          this.complete(value);
-      }
-    },
-    {
-      type: "apply",
-      state: this.BUILDER_STATES._DEFAULT,
-      callback: function(target, thisContext, locale){
-          this.data.builder.setLocale(locale);
-      }
-    }
-  ];
-
-
-
-  static isEnd = (obj) => "value" in obj && "type" in obj;
   static defaultLocale = "ru";
 }
 
