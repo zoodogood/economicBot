@@ -6,7 +6,7 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
-    const i18n = this.i18n.bind(null, interaction.locale);
+    const i18n = this.i18n.bind(this, interaction.locale);
     console.info( i18n("slashName") );
 
     this.query.UPDATE_COUNTER().execute();
@@ -21,7 +21,11 @@ class Command extends BaseCommand {
     name: "__NAME__",
     // Discord SlashCommands
     slash: {
-      description: "__DESCRIPTION__"
+      type: 1,
+      description: "__DESCRIPTION__",
+      dm_perrmissions: true,
+      default_member_permissions: 8,
+      options: []
     }
   };
 
