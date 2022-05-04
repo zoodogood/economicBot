@@ -6,8 +6,8 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
-    const i18 = this.i18.bind(null, interaction.locale);
-    const content = i18("slashName");
+    const i18n = this.i18n.bind(this, interaction.locale);
+    const content = i18n("slashName");
     return { content, ephemeral: true };
   }
 
