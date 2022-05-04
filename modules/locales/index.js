@@ -109,6 +109,7 @@ class LocaleContent {
     const lineRegex = this.constructor.getLineRegex();
     const matched = [...plainText.matchAll(lineRegex)];
 
+
     const lines = matched.map(([full, key, separator, value]) => {
       const line = {};
       line.key   = key;
@@ -124,8 +125,8 @@ class LocaleContent {
   static getLineRegex(){
     const separator = "=\\*?\\*?";
     const key       = "[a-zA-Z_$]+";
-    const content   = "(?:.|\\n)+?";
-    const end       = `(?=(?:\\s|\\n)*(?:${ key }\\s*${ separator }|$))`;
+    const content   = "(?:.|\\n|\\r)+?";
+    const end       = `(?=(?:\\s|\\n|\\r)*(?:${ key }\\s*${ separator }|$))`;
 
     const plain = `(?:\\n|\\s)*(${ key })\\s*(${ separator })\\s*\\n?(${ content })${ end }`;
     return new RegExp(plain, "g");
