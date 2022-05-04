@@ -25,8 +25,8 @@ class BaseCommand extends EventsEmitter {
     return queryProxy;
   }
 
-  i18(locale, key, ...args){
-    const resolver = globalThis.locales.lineResolver(["commands", this.name, key], locale);
+  i18n(locale, key, ...args){
+    const resolver = globalThis.i18n.api().lineResolver(["commands", this.name, key], locale);
     return resolver(...args);
   }
 }
