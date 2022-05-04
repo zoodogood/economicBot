@@ -6,9 +6,12 @@ class Command extends BaseCommand {
   }
 
   run(interaction){
+    const i18 = this.i18.bind(null, interaction.locale);
+    console.info( i18("slashName") );
+
     this.query.UPDATE_COUNTER().execute();
     const [rows: [data]] = this.query.GET_COUNTER().execute();
-    console.log( data ); // {id: 1, counter: ?}
+    console.info( data ); // {id: 1, counter: ?}
 
     const content = "IT'S COMMAND SNIPPET. IS NOT A REAL COMMAND";
     return { content, ephemeral: true };
