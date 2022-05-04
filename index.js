@@ -44,7 +44,7 @@ class App {
 
   async initLocales(){
     const locales = new LocalesStructure();
-    globalThis.locales = locales.builder.bind(locales);
+    globalThis.locales = locales;
   }
 }
 
