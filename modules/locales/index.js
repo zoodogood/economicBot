@@ -264,6 +264,3 @@ class LocaleBuilder extends BaseBuilder {
 
 
 export default LocalesStructure;
-
-
-const structure = new LocalesStructure();
