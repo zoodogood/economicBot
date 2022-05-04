@@ -19,7 +19,7 @@ try {
   const clientId = (await rest.get( Routes.user() ))
     .id;
 
-  console.info(`----\nStarted refreshing application (/) commands (${ commandsData.size })`);
+  console.info(`----\nStarted refreshing application (/) commands (${ commandsData.length })`);
 
   await rest.put(
     Routes.applicationCommands(clientId),
