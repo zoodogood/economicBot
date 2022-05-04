@@ -146,7 +146,7 @@ class I18nAPI {
     if (!(way instanceof Array))
       throw new TypeError("Way must be Array");
 
-    let current = this.structure;
+    let current = this.structure[ selectLocale ];
     for (const point of way)
       current = current?.[ point ];
 
