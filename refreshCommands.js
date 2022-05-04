@@ -7,8 +7,8 @@ import './bot/modules/commands/initCommands.js';
 
 const commandsData = globalThis.commands
   .map(command => {
-    const { name, slash: {description, options, type = 1} } = command.constructor.data;
-    return {name, description, options, type};
+    const { slash, name } = command.constructor.data;
+    return { name, ...slash };
   })
 
 
