@@ -24,6 +24,11 @@ class BaseCommand extends EventsEmitter {
     const queryProxy = new QueryBuilder(database.pool).createProxy(queries);
     return queryProxy;
   }
+
+  i18(locale, key, ...args){
+    const resolver = globalThis.locales.lineResolver(["commands", this.name, key], locale);
+    return resolver(...args);
+  }
 }
 
 
